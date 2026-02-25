@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wishlist App</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <header>
+        <h1>My Wishlist</h1>
+    </header>
+
+<main class="app">
+    <!-- Left column - Wishes -->
+    <section class="col">
+      <h2>New Wish</h2>
+      <form id="create-form">
+          <input
+              type="text"
+              id="title-input"
+              placeholder="Wish title"
+              required
+          />
+          <textarea
+              id="description-input"
+              placeholder="Description (optional)"
+          ></textarea>
+          <button type="submit" class="btn">Add</button>
+      </form>
+      <h2>My Wishes</h2>
+      <div class="search-bar">
+          <input
+              type="text"
+              id="search-input"
+              placeholder="Search by title..."
+          />
+          <button id="search-btn" class="btn">Search</button>
+      </div>
+      <div id="wishes-list" class="wishes-list">
+            <!-- JS will fill this block with wish cards -->
+      </div>
+      <div class="pagination">
+          <button id="prev-btn" class="btn btn-ghost">◀ Back</button>
+          <span id="page-info">Page 1</span>
+          <button id="next-btn" class="btn btn-ghost">Forward ▶</button>
+      </div>
+    </section>
+    <section class="col">
+      <h2>Image Search</h2>
+      <div class="search-bar">
+          <input
+              type="text"
+              id="art-search-input"
+              placeholder="Search images..."
+          />
+          <button id="art-search-btn" class="btn">Search</button>
+      </div>
+      <div id="art-results" class="art-grid">
+          <!-- JS will fill this block with image results -->
+      </div>
+      <div id="art-preview" class="img-preview">
+          <p>Select an image from the search results</p>
+      </div>
+    </section>
+</main>
+
+    <script src="script.js"></script>
+</body>
+</html>
