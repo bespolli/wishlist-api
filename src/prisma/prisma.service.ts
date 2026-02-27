@@ -14,8 +14,11 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     if (!databaseUrl) {
       throw new Error('DATABASE_URL is not defined');
     }
-
-    const pool = new pg.Pool({ connectionString: databaseUrl });
+    
+    const pool = new pg.Pool({ 
+      connectionString: databaseUrl,
+      ssl: { rejectUnauthorized: false }
+    });
     const adapter = new PrismaPg(pool);
 
     super({ adapter });  // ← Prisma 7 REQUIRES THIS ADAPTER TO WORK WITH POSTGRESQL
