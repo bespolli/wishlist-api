@@ -1,12 +1,3 @@
-/*
-  Warnings:
-
-  - Added the required column `userId` to the `Wish` table without a default value. This is not possible if the table is not empty.
-
-*/
--- AlterTable
-ALTER TABLE "Wish" ADD COLUMN     "userId" TEXT NOT NULL;
-
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
@@ -21,6 +12,15 @@ CREATE TABLE "User" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- AlterTable: FIRST ADD COLUMN with NULL, then DELETE NULLs, then SET NOT NULL
+ALTER TABLE "Wish" ADD COLUMN "userId" TEXT;
+
+-- DELETE rows with NULL userId to satisfy NOT NULL constraint
+DELETE FROM "Wish" WHERE "userId" IS NULL;
+
+-- NOW DROP NOT NULL constraint
+ALTER TABLE "Wish" ALTER COLUMN "userId" SET NOT NULL;
 
 -- AddForeignKey
 ALTER TABLE "Wish" ADD CONSTRAINT "Wish_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
