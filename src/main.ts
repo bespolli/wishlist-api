@@ -23,7 +23,7 @@ app.useStaticAssets(join(__dirname, '..', '..', 'public'));
   app.enableCors();
 
   const port = process.env.PORT || 3000;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   console.log(`Server is running on port ${port}`);
 }
 bootstrap();
