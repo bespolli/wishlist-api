@@ -6,6 +6,7 @@ import { ArtsearchModule } from './artsearch/artsearch.module';
 import { LoggerMiddleware } from './common/logger.middleware';
 import { PrismaModule } from './prisma/prisma.module';
 import { WishModule } from './wish/wish.module';
+import { AuthModule } from './auth/auth.module';
 
 
 @Module({
@@ -14,6 +15,7 @@ import { WishModule } from './wish/wish.module';
     ArtsearchModule,
     PrismaModule,
     WishModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

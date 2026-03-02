@@ -10,18 +10,21 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 
   constructor(private readonly configService: ConfigService) {
     const databaseUrl = configService.get<string>('DATABASE_URL');
-    
+
     if (!databaseUrl) {
       throw new Error('DATABASE_URL is not defined');
     }
-    
-    const pool = new pg.Pool({ 
-      connectionString: databaseUrl,
-      ssl: { rejectUnauthorized: false }
-    });
-    const adapter = new PrismaPg(pool);
 
-    super({ adapter });  // ← Prisma 7 REQUIRES THIS ADAPTER TO WORK WITH POSTGRESQL
+    // SSL enabled only in production (Render), disabled locally
+    const isProduction = configService.get<string>('NODE_ENV') === 'production';
+
+    const pool = new pg.Pool({
+      connectionString: databaseUrl,
+      ssl: isProduction ? { rejectUnauthorized: false } : false,
+    });
+
+    const adapter = new PrismaPg(pool);
+    super({ adapter });
     this.pool = pool;
   }
 

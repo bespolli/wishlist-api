@@ -7,29 +7,30 @@ import { UpdateWishDto } from './dto/update-wish.dto';
 export class WishService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // CREATE — CREATE A WISH
-  async create(createWishDto: CreateWishDto) {
+  // CREATE — now requires userId
+  async create(createWishDto: CreateWishDto, userId: string) {
     return this.prisma.wish.create({
       data: {
         title: createWishDto.title,
         description: createWishDto.description,
+        imageUrl: createWishDto.imageUrl,
+        userId,
       },
     });
   }
 
-
-  // READ LIST — GET ALL WISHES WITH PAGINATION AND SEARCH
-  async findAll(page: number = 1, limit: number = 10, search?: string) {
+  // READ LIST — only return wishes belonging to this user
+  async findAll(userId: string, page: number = 1, limit: number = 10, search?: string) {
     const skip = (page - 1) * limit;
 
-    const where = search
-      ? {
-          OR: [
-            { title: { contains: search, mode: 'insensitive' as const } },
-            { description: { contains: search, mode: 'insensitive' as const } },
-          ],
-        }
-      : {};
+    const where: any = { userId };
+
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' as const } },
+        { description: { contains: search, mode: 'insensitive' as const } },
+      ];
+    }
 
     const [data, total] = await Promise.all([
       this.prisma.wish.findMany({
@@ -52,23 +53,22 @@ export class WishService {
     };
   }
 
-  // READ ONE — GET A WISH BY ID
-  async findOne(id: string) {
+  // READ ONE — only if it belongs to this user
+  async findOne(id: string, userId: string) {
     const wish = await this.prisma.wish.findUnique({
       where: { id },
     });
 
-    if (!wish) {
+    if (!wish || wish.userId !== userId) {
       throw new NotFoundException(`Wish with id ${id} not found`);
     }
 
     return wish;
   }
 
-  // UPDATE — UPDATE A WISH
-  async update(id: string, updateWishDto: UpdateWishDto) {
-    // FIRSTLY CHECK IF THE RECORD EXISTS
-    await this.findOne(id); // RETURNS 404 IF NOT FOUND
+  // UPDATE — only if it belongs to this user
+  async update(id: string, updateWishDto: UpdateWishDto, userId: string) {
+    await this.findOne(id, userId);
 
     return this.prisma.wish.update({
       where: { id },
@@ -76,10 +76,9 @@ export class WishService {
     });
   }
 
-  // DELETE — DELETE A WISH
-  async remove(id: string) {
-    // FIRSTLY CHECK IF THE RECORD EXISTS
-    await this.findOne(id); // RETURNS 404 IF NOT FOUND
+  // DELETE — only if it belongs to this user
+  async remove(id: string, userId: string) {
+    await this.findOne(id, userId);
 
     return this.prisma.wish.delete({
       where: { id },
