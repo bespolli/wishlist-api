@@ -29,9 +29,15 @@ async function loadWishes() {
         params.append('search', searchQuery);
     }
 
-    try {
+ try {
         const response = await fetch(`/wishes?${params}`);
-        const result   = await response.json();
+
+        if (response.status === 401) {
+            wishesList.innerHTML = '<p>Please log in to see your wishes.</p>';
+            return;
+        }
+
+        const result = await response.json();
 
         totalPages = result.meta.totalPages || 1;
         renderWishes(result.data);
