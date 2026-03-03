@@ -13,6 +13,130 @@ const artSearchBtn    = document.getElementById('art-search-btn');
 const artResults      = document.getElementById('art-results');
 const artPreview      = document.getElementById('art-preview');
 
+// === AUTH ===
+let token = localStorage.getItem('token');
+let userName = localStorage.getItem('userName');
+function authHeaders() {
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+const authModal = document.getElementById('auth-modal');
+const authBar = document.getElementById('auth-bar');
+const loginForm = document.getElementById('login-form');
+const registerForm = document.getElementById('register-form');
+const loginError = document.getElementById('login-error');
+const registerError = document.getElementById('register-error');
+
+function updateAuthBar() {
+    if (token) {
+        authBar.innerHTML = `
+            <span>Hello, ${userName || 'User'}!</span>
+            <button class="btn btn-ghost" onclick="logout()">Log Out</button>
+        `;
+        authModal.classList.remove('show');
+    } else {
+        authBar.innerHTML = `
+            <button class="btn" onclick="showAuthModal()">Log In</button>
+        `;
+    }
+}
+
+function showAuthModal() {
+    authModal.classList.add('show');
+}
+
+authModal.addEventListener('click', (e) => {
+    if (e.target === authModal) {
+        authModal.classList.remove('show');
+    }
+});
+
+function switchTab(tab) {
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+    loginForm.style.display = tab === 'login' ? 'flex' : 'none';
+    registerForm.style.display = tab === 'register' ? 'flex' : 'none';
+    loginError.textContent = '';
+    registerError.textContent = '';
+}
+
+function logout() {
+    token = null;
+    userName = null;
+    localStorage.removeItem('token');
+    localStorage.removeItem('userName');
+    updateAuthBar();
+    loadWishes();
+}
+
+loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    loginError.textContent = '';
+
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    try {
+        const res = await fetch('/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            loginError.textContent = data.message || 'Login failed';
+            console.log('LOGIN RESPONSE:', res.status, data);
+            return;
+        }
+
+        token = data.accessToken;
+        userName = data.user.name;
+        localStorage.setItem('token', token);
+        localStorage.setItem('userName', userName);
+        loginForm.reset();
+        updateAuthBar();
+        loadWishes();
+    } catch (err) {
+        loginError.textContent = 'Connection error';
+    }
+});
+
+registerForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    registerError.textContent = '';
+
+    const name = document.getElementById('register-name').value.trim();
+    const email = document.getElementById('register-email').value.trim();
+    const password = document.getElementById('register-password').value;
+
+    try {
+        const res = await fetch('/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            registerError.textContent = data.message || 'Registration failed';
+            console.log('REGISTER RESPONSE:', res.status, data);
+            return;
+        }
+
+        token = data.accessToken;
+        userName = data.user.name;
+        localStorage.setItem('token', token);
+        localStorage.setItem('userName', userName);
+        registerForm.reset();
+        updateAuthBar();
+        loadWishes();
+    } catch (err) {
+        registerError.textContent = 'Connection error';
+    }
+});
+
 // === APP STATES ===
 let currentPage = 1;
 let totalPages  = 1;
@@ -20,6 +144,11 @@ let searchQuery = '';
 
 // === LOAD WISHES ===
 async function loadWishes() {
+        if (!token) {
+        wishesList.innerHTML = '<p>Please log in to see your wishes.</p>';
+        return;
+    }
+
     const params = new URLSearchParams({
         page: currentPage,
         limit: 10,
@@ -30,7 +159,9 @@ async function loadWishes() {
     }
 
  try {
-        const response = await fetch(`/wishes?${params}`);
+        const response = await fetch(`/wishes?${params}`, {
+            headers: authHeaders(),
+        });
 
         if (response.status === 401) {
             wishesList.innerHTML = '<p>Please log in to see your wishes.</p>';
@@ -86,11 +217,19 @@ createForm.addEventListener('submit', async (e) => {
     if (!title) return;
 
     try {
-        await fetch('/wishes', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, description }),
+        const response = await fetch('/wishes', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders(),
+        },
+        body: JSON.stringify({ title, description }),
         });
+
+        if (response.status === 401) {
+            alert('Please log in to add wishes.');
+            return;
+        }
 
         titleInput.value = '';
         descriptionInput.value = '';
@@ -112,7 +251,10 @@ async function editWish(id, oldTitle, oldDescription) {
     try {
         await fetch(`/wishes/${id}`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                ...authHeaders(),
+            },
             body: JSON.stringify({
                 title: newTitle,
                 description: newDescription,
@@ -132,6 +274,7 @@ async function deleteWish(id) {
     try {
         await fetch(`/wishes/${id}`, {
             method: 'DELETE',
+            headers: authHeaders(),
         });
 
         loadWishes();
@@ -217,4 +360,5 @@ function selectArt(event, imageUrl) {
 }
 
 // === START ===
+updateAuthBar();
 loadWishes();
