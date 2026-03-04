@@ -27,20 +27,21 @@ export class WishController {
   @HttpCode(HttpStatus.CREATED)
   create(
     @Body() createWishDto: CreateWishDto,
-    @GetUser() user: { id: string; email: string },
+    @GetUser() user: { id: string; email: string; role: string },
   ) {
     return this.wishService.create(createWishDto, user.id);
   }
 
   @Get()
   findAll(
-    @GetUser() user: { id: string; email: string },
+    @GetUser() user: { id: string; email: string; role: string },
     @Query('page') page?: string,
     @Query('limit') limit?: string,
     @Query('search') search?: string,
   ) {
     return this.wishService.findAll(
       user.id,
+      user.role,
       page ? parseInt(page, 10) : 1,
       limit ? parseInt(limit, 10) : 10,
       search,
@@ -50,25 +51,25 @@ export class WishController {
   @Get(':id')
   findOne(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @GetUser() user: { id: string; email: string },
+    @GetUser() user: { id: string; email: string; role: string },
   ) {
-    return this.wishService.findOne(id, user.id);
+    return this.wishService.findOne(id, user.id, user.role);
   }
 
   @Patch(':id')
   update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateWishDto: UpdateWishDto,
-    @GetUser() user: { id: string; email: string },
+    @GetUser() user: { id: string; email: string; role: string },
   ) {
-    return this.wishService.update(id, updateWishDto, user.id);
+    return this.wishService.update(id, updateWishDto, user.id, user.role);
   }
 
   @Delete(':id')
   remove(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @GetUser() user: { id: string; email: string },
+    @GetUser() user: { id: string; email: string; role: string },
   ) {
-    return this.wishService.remove(id, user.id);
+    return this.wishService.remove(id, user.id, user.role);
   }
 }

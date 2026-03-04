@@ -22,13 +22,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   // This method is called AUTOMATICALLY after the token is successfully verified
   // payload — this is what we "embedded" in the token: { sub: userId, email }
-  async validate(payload: { sub: string; email: string }) {
+  async validate(payload: { sub: string; email: string; role: string }) {
     const user = await this.userService.findById(payload.sub);
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
 
-    // What we return here will be available as req.user in controllers
-    return { id: user.id, email: user.email, name: user.name };
-  }
+    return { id: user.id, email: user.email, name: user.name, role: user.role };
+}
 }

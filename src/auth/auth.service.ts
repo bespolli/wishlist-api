@@ -30,7 +30,7 @@ export class AuthService {
     });
 
     // 4. Immediately issue a token (so the user is logged in after registration)
-    const token = this.generateToken(user.id, user.email);
+    const token = this.generateToken(user.id, user.email, user.role);
 
     return {
       accessToken: token,
@@ -38,6 +38,7 @@ export class AuthService {
         id: user.id,
         email: user.email,
         name: user.name,
+        role: user.role,
       },
     };
   }
@@ -58,7 +59,7 @@ export class AuthService {
     }
 
     // 3. Everything is fine — issue a token
-    const token = this.generateToken(user.id, user.email);
+    const token = this.generateToken(user.id, user.email, user.role);
 
     return {
       accessToken: token,
@@ -66,16 +67,17 @@ export class AuthService {
         id: user.id,
         email: user.email,
         name: user.name,
+        role: user.role,
       },
     };
   }
 
   // ===== TOKEN GENERATION =====
-  private generateToken(userId: string, email: string): string {
+  private generateToken(userId: string, email: string, role: string): string {
     // Embed the user's id and email in the token
     // Later, when the user sends this token with a request,
     // we can identify WHO they are
-    const payload = { sub: userId, email };
+    const payload = { sub: userId, email, role };
     return this.jwtService.sign(payload);
   }
 }
