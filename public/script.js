@@ -16,6 +16,7 @@ const artPreview      = document.getElementById('art-preview');
 // === AUTH ===
 let token = localStorage.getItem('token');
 let userName = localStorage.getItem('userName');
+let role = localStorage.getItem('role');
 function authHeaders() {
     return token ? { 'Authorization': `Bearer ${token}` } : {};
 }
@@ -29,7 +30,7 @@ const registerError = document.getElementById('register-error');
 function updateAuthBar() {
     if (token) {
         authBar.innerHTML = `
-            <span>Hello, ${userName || 'User'}!</span>
+            <span>Hello, ${userName || 'User'}! ${'(' + role + ')' || '(USER)'}</span>
             <button class="btn btn-ghost" onclick="logout()">Log Out</button>
         `;
         authModal.classList.remove('show');
@@ -62,8 +63,10 @@ function switchTab(tab) {
 function logout() {
     token = null;
     userName = null;
+    role = null;
     localStorage.removeItem('token');
     localStorage.removeItem('userName');
+    localStorage.removeItem('role');
     updateAuthBar();
     loadWishes();
 }
@@ -92,8 +95,9 @@ loginForm.addEventListener('submit', async (e) => {
 
         token = data.accessToken;
         userName = data.user.name;
-        localStorage.setItem('token', token);
+        role = data.user.role;
         localStorage.setItem('userName', userName);
+        localStorage.setItem('role', role);
         loginForm.reset();
         updateAuthBar();
         loadWishes();
@@ -129,6 +133,7 @@ registerForm.addEventListener('submit', async (e) => {
         userName = data.user.name;
         localStorage.setItem('token', token);
         localStorage.setItem('userName', userName);
+        localStorage.setItem('role', role);
         registerForm.reset();
         updateAuthBar();
         loadWishes();
