@@ -30,7 +30,7 @@ const registerError = document.getElementById('register-error');
 function updateAuthBar() {
     if (token) {
         authBar.innerHTML = `
-            <span>Hello, ${userName || 'User'}! ${'(' + role + ')' || '(USER)'}</span>
+            <span>Hello, ${userName || 'User'}! (${role || 'USER'})</span>
             <button class="btn btn-ghost" onclick="logout()">Log Out</button>
         `;
         authModal.classList.remove('show');
@@ -96,6 +96,7 @@ loginForm.addEventListener('submit', async (e) => {
         token = data.accessToken;
         userName = data.user.name;
         role = data.user.role;
+        localStorage.setItem('token', token);
         localStorage.setItem('userName', userName);
         localStorage.setItem('role', role);
         loginForm.reset();
@@ -131,6 +132,7 @@ registerForm.addEventListener('submit', async (e) => {
 
         token = data.accessToken;
         userName = data.user.name;
+        role = data.user.role;
         localStorage.setItem('token', token);
         localStorage.setItem('userName', userName);
         localStorage.setItem('role', role);
