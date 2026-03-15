@@ -25,7 +25,7 @@ model Wish {
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
-  password  String
+  password  String?
   name      String?
   role      Role     @default(USER)
   createdAt DateTime @default(now())

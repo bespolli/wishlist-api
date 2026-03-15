@@ -2,6 +2,7 @@ import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { GoogleLoginDto } from './dto/google-login.dto';
 
 @Controller('auth')  // all routes will start with /auth
 export class AuthController {
@@ -19,4 +20,12 @@ export class AuthController {
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto.email, dto.password);
   }
+
+  // POST /auth/google — log in via Google
+  @Post('google')
+  @HttpCode(HttpStatus.OK)
+  googleLogin(@Body() dto: GoogleLoginDto) {
+    return this.authService.googleLogin(dto.credential);
+  }
+
 }

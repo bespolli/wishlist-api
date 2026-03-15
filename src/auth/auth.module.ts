@@ -11,6 +11,7 @@ import { UserModule } from '../user/user.module';
   imports: [
     UserModule,          // required for UserService
     PassportModule,      // integrating Passport
+    ConfigModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
