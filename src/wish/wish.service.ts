@@ -20,7 +20,7 @@ export class WishService {
   }
 
   // READ LIST — only return wishes belonging to this user
-  async findAll(userId: string, role: string, page: number = 1, limit: number = 10, search?: string) {
+  async findAll(userId: string, role: string, page: number = 1, limit: number = 5, search?: string) {
     const skip = (page - 1) * limit;
 
     const where: any = {};

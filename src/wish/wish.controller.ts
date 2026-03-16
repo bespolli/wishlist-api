@@ -42,8 +42,8 @@ export class WishController {
     return this.wishService.findAll(
       user.id,
       user.role,
-      page ? parseInt(page, 10) : 1,
-      limit ? parseInt(limit, 10) : 10,
+      page ? parseInt(page, 5) : 1,
+      limit ? parseInt(limit, 5) : 5,
       search,
     );
   }
