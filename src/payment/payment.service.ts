@@ -63,6 +63,7 @@ export class PaymentService {
       success_url: this.config.get<string>('FRONTEND_URL') + '/payment/success?session_id={CHECKOUT_SESSION_ID}',
       cancel_url: this.config.get<string>('FRONTEND_URL') + '/payment/cancel',
       metadata: { userId },
+      expires_at: Math.floor(Date.now() / 1000) + 1800,
     });
 
     await (this.prisma as any).transaction.create({
