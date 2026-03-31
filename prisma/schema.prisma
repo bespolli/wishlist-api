@@ -11,6 +11,13 @@ enum Role {
   ADMIN
 }
 
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+
 model Wish {
   id          String   @id @default(uuid())
   title       String   @db.VarChar(255)
@@ -28,7 +35,25 @@ model User {
   password  String?
   name      String?
   role      Role     @default(USER)
+  stripeCustomerId String?       @unique
+  balanceAvailable Int           @default(0)
+  balancePending   Int           @default(0)
+  balanceTotal     Int           @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  transactions     Transaction[]
   wishes    Wish[]
+}
+
+model Transaction {
+  id                    String            @id @default(uuid())
+  userId                String
+  user                  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeSessionId       String            @unique
+  stripePaymentIntentId String?           @unique
+  amount                Int               
+  currency              String            @default("usd")
+  status                TransactionStatus @default(PENDING)
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
 }

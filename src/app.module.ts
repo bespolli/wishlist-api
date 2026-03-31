@@ -7,6 +7,7 @@ import { LoggerMiddleware } from './common/logger.middleware';
 import { PrismaModule } from './prisma/prisma.module';
 import { WishModule } from './wish/wish.module';
 import { AuthModule } from './auth/auth.module';
+import { PaymentModule } from './payment/payment.module';
 
 
 @Module({
@@ -16,6 +17,7 @@ import { AuthModule } from './auth/auth.module';
     PrismaModule,
     WishModule,
     AuthModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

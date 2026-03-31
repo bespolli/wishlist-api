@@ -5,7 +5,9 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    rawBody: true,
+  });
 
   // VALIDATION PIPE, FOR DTO TO AUTOMATICALLY VALIDATE INCOMING DATA
   app.useGlobalPipes(
@@ -17,7 +19,7 @@ async function bootstrap() {
   );
 
   // STATIC ASSETS, TO SERVE THE FRONTEND
-app.useStaticAssets(join(__dirname, '..', '..', 'public'));
+  app.useStaticAssets(join(__dirname, '..', '..', 'public'));
 
   // CORS, FOR FRONTEND TO BE ABLE TO CALL THE API
   app.enableCors();
